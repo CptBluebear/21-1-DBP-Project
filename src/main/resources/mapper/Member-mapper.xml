@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.MemberMapper">
+	
+	<resultMap type="org.corodiak.library.model.Member" id="Member">
+		<id column="oid" property="memberOid"/>
+		<result column="id" property="memberId"/>
+		<result column="password" property="memberPassword"/>
+		<result column="name" property="memberName"/>
+		<result column="phoneNumber" property="memberPhoneNumber"/>
+		<result column="address" property="memberAddress"/>
+	</resultMap>
+	
+	<select id="selectMemberList" resultMap="Member">
+		SELECT oid, id, password, name, phoneNumber, address
+		FROM MEMBER
+		ORDER BY oid ASC
+	</select>
+
+	<select id="selectMemberById" parameterType="Map" resultMap="Member">
+		SELECT oid, id, password, name, phoneNumber, address
+		FROM MEMBER
+		WHERE id = #{id}
+	</select>
+	
+	<insert id="insertMember" parameterType="Map">
+		<selectKey keyProperty="member.memberOid" resultType="Integer" order="BEFORE">
+        	SELECT MEMBER_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO Member (oid, id, password, name, phoneNumber, address)
+		VALUES (#{member.memberOid}, #{member.memberId}, #{member.memberPassword}, #{member.memberName}, #{member.memberPhoneNumber}, #{member.memberAddress})
+	</insert>
+	
+	<delete id="deleteMemberByOid" parameterType="Map">
+		DELETE FROM Member WHERE oid=#{oid}
+	</delete>
+	
+	<select id="selectAdminByOid" parameterType="Map" resultType="int">
+		SELECT count(*)
+		FROM Admin
+		WHERE oid=#{oid}
+	</select>
+	
+	<update id="updateMemberByOid" parameterType="Map">
+		UPDATE Member
+		SET
+			password = #{member.memberPassword},
+			phoneNumber = #{member.memberPhoneNumber},
+			address = #{member.memberAddress}
+		WHERE
+			oid = #{member.memberOid}
+	</update>
+	
+</mapper>

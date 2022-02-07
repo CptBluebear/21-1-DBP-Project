@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.ArticleMapper">
+
+	<resultMap type="org.corodiak.library.model.Article" id="Article">
+		<id column="oid" property="articleOid" />
+		<result column="material_id" property="materialOid" />
+		<result column="name" property="materialName" />
+		<result column="registerDate" property="materialRegisterDate" />
+		<result column="price" property="materialPrice" />
+		<result column="loanable" property="materialLoanable" />
+		<result column="author" property="articleAuthor" />
+		<result column="ra" property="articleRa" />
+		<result column="keyword" property="articleKeyword" />
+	</resultMap>
+	
+	<select id="selectArticleList" parameterType="Map" resultMap="Article">
+		SELECT
+			Article.oid, Article.author, Article.ra, Article.keyword,
+			Article.material_id, Material.name, Material.registerDate, Material.price, Material.loanable
+		FROM Article
+		JOIN Material ON Article.material_id = Material.oid
+		<if test="article != null">
+			<where>
+				<if test="article.materialName != null">AND Material.name LIKE '%'||#{article.materialName}||'%'</if>
+				<if test="article.articleAuthor != null">AND Article.author LIKE '%'||#{article.articleAuthor}||'%'</if>
+				<if test="article.articleRa != null">AND Article.ra LIKE '%'||#{article.articleRa}||'%'</if>
+				<if test="article.articleKeyword != null">AND Article.keyword LIKE '%'||#{article.articleKeyword}||'%'</if>
+			</where>
+		</if>
+		ORDER BY Article.material_id ASC
+	</select>
+	
+	<insert id="insertArticle" parameterType="Map">
+		<selectKey keyProperty="article.articleOid" resultType="Integer" order="BEFORE">
+        	SELECT ARTICLE_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO Article (oid, material_id, author, ra, keyword)
+		VALUES (#{article.articleOid}, #{article.materialOid}, #{article.articleAuthor}, #{article.articleRa}, #{article.articleKeyword})
+	</insert>
+	
+	<delete id="deleteArticleByMaterialId" parameterType="Map">
+		DELETE FROM Article WHERE material_id = #{materialOid}
+	</delete>
+
+</mapper>

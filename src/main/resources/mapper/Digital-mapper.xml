@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.DigitalMapper">
+	<resultMap type="org.corodiak.library.model.Digital" id="Digital">
+		<id column="oid" property="digitalOid" />
+		<result column="material_id" property="materialOid" />
+		<result column="name" property="materialName" />
+		<result column="registerDate" property="materialRegisterDate" />
+		<result column="price" property="materialPrice" />
+		<result column="loanable" property="materialLoanable" />
+		<result column="filePath" property="digitalFilePath" />
+	</resultMap>
+	
+	<select id="selectDigitalList" parameterType="Map" resultMap="Digital">
+		SELECT
+			Digital.oid, Digital.filePath,
+			Digital.material_id, Material.name, Material.registerDate, Material.price, Material.loanable
+		FROM Digital
+		JOIN Material ON Digital.material_id = Material.oid
+		<if test="digital != null">
+			<where>
+				<if test="digital.materialName != null">AND Material.name LIKE '%'||#{digital.materialName}||'%'</if>
+			</where>
+		</if>
+		ORDER BY Digital.material_id ASC
+	</select>
+	
+	<insert id="insertDigital" parameterType="Map">
+		<selectKey keyProperty="digital.digitalOid" resultType="Integer" order="BEFORE">
+        	SELECT DIGITAL_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO Digital (oid, material_id, filePath)
+		VALUES (#{digital.digitalOid}, #{digital.materialOid}, #{digital.digitalFilePath})
+	</insert>
+	
+	<delete id="deleteDigitalByMaterialId" parameterType="Map">
+		DELETE FROM Digital WHERE material_id = #{materialOid}
+	</delete>
+	
+</mapper>

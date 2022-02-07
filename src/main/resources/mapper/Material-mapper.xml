@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.MaterialMapper">
+	
+	<resultMap type="org.corodiak.library.model.MaterialImpl" id="Material">
+		<id column="oid" property="materialOid" />
+		<result column="name" property="materialName" />
+		<result column="registerDate" property="materialRegisterDate" />
+		<result column="price" property="materialPrice" />
+		<result column="loanable" property="materialLoanable" />
+	</resultMap>
+	
+	<select id="selectMaterialList" parameterType="Map" resultMap="Material">
+		SELECT oid, name, registerDate, price, loanable
+		FROM Material
+		<if test="material != null">
+			<where>
+				<if test="material.materialName != null">AND name LIKE '%'||#{material.materialName}||'%'</if>
+				<if test="material.materialLoanable != 0">AND loanable = #{material.materialLoanable}</if>
+			</where>
+		</if>
+		ORDER BY oid ASC
+	</select>
+	
+	<select id="selectMaterialByOid" parameterType="Map" resultMap="Material">
+		SELECT oid, name, registerDate, price, loanable
+		FROM Material
+		WHERE oid = #{oid}
+	</select>
+	
+	<insert id="insertMaterial" parameterType="Map">
+		INSERT INTO Material (oid, name, registerDate, price, loanable)
+		VALUES (#{material.materialOid}, #{material.materialName}, #{material.materialRegisterDate}, #{material.materialPrice}, #{material.materialLoanable})
+	</insert>
+	
+	<delete id="deleteMaterialByOid" parameterType="Map">
+		DELETE FROM Material WHERE oid=#{oid}
+	</delete>
+	
+	<update id="updateMaterialLoanableByOid" parameterType="Map">
+		UPDATE Material
+		SET
+		loanable = #{loanable}
+		WHERE oid = #{oid}
+	</update>
+	
+</mapper>

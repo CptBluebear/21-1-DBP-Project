@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.MediaTypeMapper">
+	<resultMap type="org.corodiak.library.model.MediaType" id="MediaType">
+		<id column="oid" property="mediaTypeOid" />
+		<result column="name" property="mediaTypeName" />
+	</resultMap>
+	
+	<select id="selectMediaTypeList" resultMap="MediaType">
+		SELECT oid, name
+		FROM MediaType
+		ORDER BY oid
+	</select>
+	
+	<insert id="insertMediaType" parameterType="Map">
+		<selectKey keyProperty="mediaType.mediaTypeOid" resultType="Integer" order="BEFORE">
+        	SELECT MEDIATYPE_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO MediaType (oid, name)
+		VALUES (#{mediaType.mediaTypeOid}, #{mediaType.mediaTypeName})
+	</insert>
+	
+</mapper>

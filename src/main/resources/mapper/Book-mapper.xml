@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.BookMapper">
+	
+	<resultMap type="org.corodiak.library.model.Book" id="Book">
+		<id column="oid" property="bookOid" />
+		<result column="material_id" property="materialOid" />
+		<result column="name" property="materialName" />
+		<result column="registerDate" property="materialRegisterDate" />
+		<result column="price" property="materialPrice" />
+		<result column="loanable" property="materialLoanable" />
+		<result column="author" property="bookAuthor" />
+		<result column="publisher" property="bookPublisher" />
+		<result column="publishDate" property="bookPublishDate" />
+		<result column="isbn" property="bookIsbn" />
+	</resultMap>
+	
+	<select id="selectBookList" parameterType="Map" resultMap="Book">
+		SELECT
+			Book.oid, Book.author, Book.publisher, Book.publishDate, Book.isbn,
+			Book.material_id, Material.name, Material.registerDate, Material.price, Material.loanable
+		FROM Book
+		JOIN Material ON Book.material_id = Material.oid
+		<if test="book != null">
+			<where>
+				<if test="book.materialName != null">AND Material.name LIKE '%'||#{book.materialName}||'%'</if>
+				<if test="book.bookAuthor != null">AND Book.author LIKE '%'||#{book.bookAuthor}||'%'</if>
+				<if test="book.bookPublisher != null">AND Book.publisher LIKE '%'||#{book.bookPublisher}||'%'</if>
+			</where>
+		</if>
+		ORDER BY Book.material_id ASC
+	</select>
+	
+	<insert id="insertBook" parameterType="Map">
+		<selectKey keyProperty="book.bookOid" resultType="Integer" order="BEFORE">
+        	SELECT BOOK_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO Book (oid, material_id, author, publisher, publishDate, isbn)
+		VALUES (#{book.bookOid}, #{book.materialOid}, #{book.bookAuthor}, #{book.bookPublisher}, #{book.bookPublishDate}, #{book.bookIsbn})
+	</insert>
+	
+	<delete id="deleteBookByMaterialId" parameterType="Map">
+		DELETE FROM Book WHERE material_id = #{materialOid}
+	</delete>
+	
+</mapper>

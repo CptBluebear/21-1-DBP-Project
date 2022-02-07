@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.MultiMediaMapper">
+
+	<resultMap type="org.corodiak.library.model.MultiMedia" id="MultiMedia">
+		<id column="oid" property="multiMediaOid" />
+		<result column="material_id" property="materialOid" />
+		<result column="name" property="materialName" />
+		<result column="registerDate" property="materialRegisterDate" />
+		<result column="price" property="materialPrice" />
+		<result column="loanable" property="materialLoanable" />
+		<association column="mediaType_id" property="multiMediaType" javaType="org.corodiak.library.model.MediaType">
+			<id column="mediaType_id" property="mediaTypeOid" />
+			<result column="mediaType_name" property="mediaTypeName" />
+		</association>
+	</resultMap>
+	
+	<select id="selectMultiMediaList" resultMap="MultiMedia">
+		SELECT
+			MultiMedia.oid,
+			MultiMedia.material_id, Material.name, Material.registerDate, Material.price, Material.loanable,
+			MultiMedia.mediaType_id, MediaType.name AS mediaType_name
+		FROM MultiMedia
+		JOIN Material ON MultiMedia.material_id = Material.oid
+		JOIN MediaType ON MultiMedia.mediaType_id = MediaType.oid
+		<if test="multiMedia != null">
+			<where>
+				<if test="multiMedia.materialName != null">AND Material.name LIKE '%'||#{multiMedia.materialName}||'%'</if>
+			</where>
+		</if>
+		ORDER BY MultiMedia.material_id ASC
+	</select>
+	
+	<insert id="insertMultiMedia" parameterType="Map">
+		<selectKey keyProperty="multiMedia.multiMediaOid" resultType="Integer" order="BEFORE">
+        	SELECT MULTIMEDIA_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO MultiMedia (oid, material_id, mediaType_id)
+		VALUES(#{multiMedia.multiMediaOid}, #{multiMedia.materialOid}, #{mediaType.mediaTypeOid})
+	</insert>
+	
+	<delete id="deleteMultiMediaByMaterialId" parameterType="Map">
+		DELETE FROM MultiMedia WHERE material_id = #{materialOid}
+	</delete>
+
+</mapper>

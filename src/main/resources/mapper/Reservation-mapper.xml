@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.corodiak.library.mapper.ReservationMapper">
+	
+	<resultMap type="org.corodiak.library.model.Reservation" id="Reservation">
+		<id column="oid" property="reservationOid" />
+		<result column="reservationDate" property="reservationDate" />
+		<association column="material_id" property="reservationMaterial" javaType="org.corodiak.library.model.MaterialImpl">
+			<id column="material_id" property="materialOid" />
+			<result column="material_name" property="materialName" />
+			<result column="material_registerDate" property="materialRegisterDate" />
+			<result column="material_price" property="materialPrice" />
+			<result column="material_loanable" property="materialLoanable" />
+		</association>
+		<association column="member_oid" property="reservationMember" javaType="org.corodiak.library.model.Member">
+			<id column="member_oid" property="memberOid"/>
+			<result column="member_id" property="memberId"/>
+			<result column="member_password" property="memberPassword"/>
+			<result column="member_name" property="memberName"/>
+			<result column="member_phoneNumber" property="memberPhoneNumber"/>
+			<result column="member_address" property="memberAddress"/>
+		</association>
+	</resultMap>
+	
+	<select id="selectReservationList" parameterType="Map" resultMap="Reservation">
+		SELECT
+			Reservation.oid, Reservation.reservationDate,
+			Reservation.material_id,
+				Material.name AS material_name,
+				Material.registerDate AS material_registerDate,
+				Material.price AS material_price,
+				Material.loanable AS material_loanable,
+			Reservation.member_id AS member_oid,
+				Member.id AS member_id,
+				Member.password AS member_password,
+				Member.name AS member_name,
+				Member.phoneNumber AS member_phoneNumber,
+				Member.address AS member_address
+		FROM Reservation
+		JOIN Material ON Reservation.material_id = Material.oid
+		JOIN Member ON Reservation.member_id = Member.oid
+		ORDER BY oid ASC
+	</select>
+	
+	<select id="selectReservationByMaterialOid" parameterType="Map" resultMap="Reservation">
+		SELECT
+			Reservation.oid, Reservation.reservationDate,
+			Reservation.material_id,
+				Material.name AS material_name,
+				Material.registerDate AS material_registerDate,
+				Material.price AS material_price,
+				Material.loanable AS material_loanable,
+			Reservation.member_id AS member_oid,
+				Member.id AS member_id,
+				Member.password AS member_password,
+				Member.name AS member_name,
+				Member.phoneNumber AS member_phoneNumber,
+				Member.address AS member_address
+		FROM Reservation
+		JOIN Material ON Reservation.material_id = Material.oid
+		JOIN Member ON Reservation.member_id = Member.oid
+		WHERE Reservation.material_id = #{materialOid}
+		ORDER BY oid DESC
+	</select>
+	
+	<insert id="insertReservation" parameterType="Map">
+		<selectKey keyProperty="reservation.reservationOid" resultType="Integer" order="BEFORE">
+        	SELECT RESERVATION_SEQ.nextval AS SEQ FROM dual
+		</selectKey>
+		INSERT INTO RESERVATION (oid, material_id, member_id, reservationDate)
+		VALUES (#{reservation.reservationOid}, #{material.materialOid}, #{member.memberOid}, #{reservation.reservationDate})
+	</insert>
+	
+	<delete id="deleteReservationByOid" parameterType="Map">
+		DELETE FROM Reservation WHERE oid = #{oid}
+	</delete>
+	
+</mapper>
